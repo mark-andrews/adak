@@ -6,18 +6,48 @@ import numpy as np
 from datetime import datetime 
 
 
+# ============================= Parameters ====================================================
+
 TRIAL_TIMEOUT = 5 # Number of seconds before trial times out and moves on
 USE_FULLSCREEN = True # Use fullscreen? Best to set to True for real thing
 BREAK_DURATION = 100 # Number of seconds for the break between blocks; set to around 100 for real thing
-STIMULI_FILENAME = 'stimuli_4_50_1010101' # The stimuli filename, wo the .json extension
-USE_DIALOG = True
-
+STIMULI_FILENAME = 'stimuli_4_50_1010101' # The stimuli filename wo the .json extension
 # Set the following to True when using the stimulus presentation
 # device that uses a parallel port to send triggers
 # Comment out this line to use triggers
-USE_PARALLEL_PORT = False
-# Uncomment this line to use triggers
-# USE_PARALLEL_PORT = True
+USE_PARALLEL_PORT = True
+USE_DIALOG = True
+
+results_date_time_stamp = datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
+
+# ============================= Dialog Box =====================================================
+
+expInfo = {'Participant ID': '',
+           'Stimuli file': STIMULI_FILENAME,
+           'Break duration': BREAK_DURATION,
+           'Fullscreen': USE_FULLSCREEN,
+           'Parallel port': USE_PARALLEL_PORT,
+           'Trial timeout': TRIAL_TIMEOUT}
+
+if USE_DIALOG:
+    dlg = gui.DlgFromDict(dictionary=expInfo, 
+                          title='ANS Task Experiment', 
+                          order = ['Participant ID', 
+                                   'Stimuli file', 
+                                   'Break duration', 
+                                   'Trial timeout', 
+                                   'Fullscreen', 
+                                   'Parallel port'])
+    if dlg.OK == False:
+        core.quit()
+
+TRIAL_TIMEOUT = float(expInfo['Trial timeout'])
+BREAK_DURATION = int(expInfo['Break duration'])
+STIMULI_FILENAME = expInfo['Stimuli file']
+USE_FULLSCREEN = expInfo['Fullscreen']
+USE_PARALLEL_PORT = expInfo['Parallel port']
+
+# ============================= Set up =====================================================
 
 _random = np.random.RandomState(None)
 
@@ -47,24 +77,6 @@ else:
 # copied from previous Psychopy trigger code
 parallel.setPortAddress(address=0x0378)
 
-results_date_time_stamp = datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
-
-
-expInfo = {'Participant ID': '',
-           'Stimuli file': STIMULI_FILENAME,
-           'Break duration': BREAK_DURATION,
-           'Trial timeout': TRIAL_TIMEOUT}
-
-if USE_DIALOG:
-    dlg = gui.DlgFromDict(dictionary=expInfo, 
-                          title='ANS Task Experiment', 
-                          order = ['Participant ID', 'Stimuli file', 'Break duration', 'Trial timeout'])
-    if dlg.OK == False:
-        core.quit()
-
-TRIAL_TIMEOUT = float(expInfo['Trial timeout'])
-BREAK_DURATION = int(expInfo['Break duration'])
-STIMULI_FILENAME = expInfo['Stimuli file']
 
 # ============================= UTILS ==========================================================
 
