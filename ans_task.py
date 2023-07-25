@@ -68,7 +68,7 @@ else:
     # Basically, port functions are ignored.
     class Parallel(object):
         def setData(self, x):
-            pass
+            print('Trigger: ' + str(x))
         def setPortAddress(self, address):
             pass
 
@@ -92,6 +92,10 @@ def load_stimuli(filename='stimuli'):
         stimuli = json.load(f)
 
     return stimuli
+
+def parallel_setData(trigger):
+    parallel.setData(0)
+    parallel.setData(trigger)
 
 
 class BlobDisplayObject:
@@ -155,7 +159,7 @@ def show_dots(dots_stimuli):
         event.clearEvents()
 
         # Dot display trial start trigger
-        parallel.setData(2)
+        parallel_setData(2)
 
         while True:
 
@@ -171,9 +175,9 @@ def show_dots(dots_stimuli):
                 if key_pressed in ('left', 'right', 'escape'):
                     # Dot display response trigger
                     if key_pressed == 'left':
-                        parallel.setData(4) # left key pressed
+                        parallel_setData(4) # left key pressed
                     elif key_pressed == 'right':
-                        parallel.setData(6) # right key pressed
+                        parallel_setData(6) # right key pressed
                     else:
                         core.quit()
 
@@ -218,7 +222,7 @@ def show_blobs(blobs_stimuli):
         event.clearEvents()
         
         # Blob display trial start trigger
-        parallel.setData(8)
+        parallel_setData(8)
 
         while True:
 
@@ -235,9 +239,9 @@ def show_blobs(blobs_stimuli):
                     # Blob display response trigger
                     # Trigger codes for left/right same as for dot displays
                     if key_pressed == 'left':
-                        parallel.setData(4) # left key pressed
+                        parallel_setData(4) # left key pressed
                     elif key_pressed == 'right':
-                        parallel.setData(6) # right key pressed
+                        parallel_setData(6) # right key pressed
                     else:
                         core.quit()
 
@@ -429,7 +433,7 @@ for k, block_stimuli in enumerate(blocks_stimuli):
     
     if k + 1 < len(blocks_stimuli):
         # Inter-block countdown trigger
-        parallel.setData(10)
+        parallel_setData(10)
         countdown(tics = BREAK_DURATION)
 
 show_block_start('Experiment completed.')
