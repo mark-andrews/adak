@@ -1,14 +1,16 @@
-from psychopy import visual, event, core
+from psychopy import visual, event, core, gui
+import inspect
 import time
 import json
 import numpy as np
 from datetime import datetime 
 
 
-TRIAL_TIMEOUT = 0.5 # Number of seconds before trial times out and moves on
-USE_FULLSCREEN = False # Use fullscreen? Best to set to True for real thing
-BREAK_DURATION = 5 # Number of seconds for the break between blocks; set to around 100 for real thing
-STIMULI_FILENAME = 'stimuli_4_5_1010101.json' # The stimuli filename
+TRIAL_TIMEOUT = 5 # Number of seconds before trial times out and moves on
+USE_FULLSCREEN = True # Use fullscreen? Best to set to True for real thing
+BREAK_DURATION = 100 # Number of seconds for the break between blocks; set to around 100 for real thing
+STIMULI_FILENAME = 'stimuli_4_50_1010101' # The stimuli filename, wo the .json extension
+USE_DIALOG = True
 
 # Set the following to True when using the stimulus presentation
 # device that uses a parallel port to send triggers
@@ -47,9 +49,34 @@ parallel.setPortAddress(address=0x0378)
 
 results_date_time_stamp = datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
 
-def load_stimuli(filename='stimuli.json'):
+
+expInfo = {'Participant ID': '',
+           'Stimuli file': STIMULI_FILENAME,
+           'Break duration': BREAK_DURATION,
+           'Trial timeout': TRIAL_TIMEOUT}
+
+if USE_DIALOG:
+    dlg = gui.DlgFromDict(dictionary=expInfo, 
+                          title='ANS Task Experiment', 
+                          order = ['Participant ID', 'Stimuli file', 'Break duration', 'Trial timeout'])
+    if dlg.OK == False:
+        core.quit()
+
+TRIAL_TIMEOUT = float(expInfo['Trial timeout'])
+BREAK_DURATION = int(expInfo['Break duration'])
+STIMULI_FILENAME = expInfo['Stimuli file']
+
+# ============================= UTILS ==========================================================
+
+def this_module_as_string():
+    'Return this module as a compressed string'
+    with open(inspect.stack()[-1].filename, 'r') as f:
+        return f.read()
+
+
+def load_stimuli(filename='stimuli'):
     'Load the ANS task stimuli'
-    with open(filename, 'r') as f:
+    with open(filename + '.json', 'r') as f:
         stimuli = json.load(f)
 
     return stimuli
@@ -216,6 +243,53 @@ def show_blobs(blobs_stimuli):
 
     return results
 
+
+def show_block_start(text='Block'):
+    start_time = time.time()
+    start_text.setText(text)
+    while True:
+        start_text.draw()
+        win.flip()
+
+        if time.time() - start_time > 2:
+            break
+
+def countdown(tics = 100):
+
+    start_time = time.time()
+    
+    while True:
+
+        time_elapsed = time.time() - start_time
+        instrtext.setText(COUNTDOWN % (tics - time_elapsed))
+        instrtext.draw()
+        win.flip()
+
+        if time_elapsed > tics:
+            break
+
+        keys_pressed = event.getKeys()
+        if len(keys_pressed) > 0:  # at least one key was pressed
+            if keys_pressed[0] == 'escape':
+                core.quit()
+            break
+
+
+def show_instructions(text):
+
+    instrtext.setText(text)
+
+    while True:
+        instrtext.draw()
+        win.flip()
+        # listen for key press
+        keys_pressed = event.getKeys()
+        if len(keys_pressed) > 0:  # at least one key was pressed
+            if keys_pressed[0] == 'escape':
+                core.quit()
+            break
+
+
 #=============================================================================
 
 blocks_stimuli = load_stimuli(filename=STIMULI_FILENAME)
@@ -290,58 +364,24 @@ instrtext = visual.TextStim(
     win=win, text='INSTRUCTIONS TEXT', font=u'Arial', color='black', height=0.06, alignText='left')
 
 
-def show_block_start(text='Block'):
-    start_time = time.time()
-    start_text.setText(text)
-    while True:
-        start_text.draw()
-        win.flip()
-
-        if time.time() - start_time > 2:
-            break
-
-def countdown(tics = 100):
-
-    start_time = time.time()
-    
-    while True:
-
-        time_elapsed = time.time() - start_time
-        instrtext.setText(COUNTDOWN % (tics - time_elapsed))
-        instrtext.draw()
-        win.flip()
-
-        if time_elapsed > tics:
-            break
-
-        keys_pressed = event.getKeys()
-        if len(keys_pressed) > 0:  # at least one key was pressed
-            if keys_pressed[0] == 'escape':
-                core.quit()
-            break
-
-
-def show_instructions(text):
-
-    instrtext.setText(text)
-
-    while True:
-        instrtext.draw()
-        win.flip()
-        # listen for key press
-        keys_pressed = event.getKeys()
-        if len(keys_pressed) > 0:  # at least one key was pressed
-            if keys_pressed[0] == 'escape':
-                core.quit()
-            break
-
 
 show_instructions(INSTRUCTIONS_TEXT_1)
 show_instructions(INSTRUCTIONS_TEXT_2)
 
 
 dots_blobs_order = ['dots', 'blobs']
-RESULTS = []
+
+experiment_information = {}
+experiment_information['code'] = this_module_as_string()
+experiment_information['participant_id'] = expInfo['Participant ID']
+experiment_information['fullscreen'] = USE_FULLSCREEN
+experiment_information['stimuli_file'] = expInfo['Stimuli file']
+experiment_information['trial_timeout'] = expInfo['Trial timeout']
+experiment_information['break_duration'] = expInfo['Break duration']
+experiment_information['datetime'] = results_date_time_stamp
+
+RESULTS = [experiment_information]
+
 for k, block_stimuli in enumerate(blocks_stimuli):
     
     # Block start trigger
@@ -372,7 +412,7 @@ for k, block_stimuli in enumerate(blocks_stimuli):
 
 
     # write results to file
-    with open(results_date_time_stamp + '_results.json', 'w') as f:
+    with open(expInfo['Participant ID'] + '_' + results_date_time_stamp + '_results.json', 'w') as f:
         json.dump(RESULTS, f, indent=4)
     
     if k + 1 < len(blocks_stimuli):
@@ -381,3 +421,4 @@ for k, block_stimuli in enumerate(blocks_stimuli):
         countdown(tics = BREAK_DURATION)
 
 show_block_start('Experiment completed.')
+
