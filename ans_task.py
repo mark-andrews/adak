@@ -4,7 +4,13 @@ import json
 import numpy as np
 from datetime import datetime 
 
-# Set to True when using the stimulus presentation
+
+TRIAL_TIMEOUT = 0.5 # Number of seconds before trial times out and moves on
+USE_FULLSCREEN = False # Use fullscreen? Best to set to True for real thing
+BREAK_DURATION = 5 # Number of seconds for the break between blocks; set to around 100 for real thing
+STIMULI_FILENAME = 'stimuli_4_5_1010101.json' # The stimuli filename
+
+# Set the following to True when using the stimulus presentation
 # device that uses a parallel port to send triggers
 # Comment out this line to use triggers
 USE_PARALLEL_PORT = False
@@ -15,7 +21,7 @@ _random = np.random.RandomState(None)
 
 trialClock = core.Clock()
 
-win = visual.Window(size=(1000, 1000), fullscr=True, color='white')
+win = visual.Window(size=(1000, 1000), fullscr=USE_FULLSCREEN, color='white')
 
 width, height = win.size
 LEFT_CENTRE = -width / 4
@@ -123,14 +129,20 @@ def show_dots(dots_stimuli):
             keys_pressed = event.getKeys()
             if len(keys_pressed) > 0:  # at least one key was pressed
                 key_pressed = keys_pressed[0]
-                if key_pressed in ('left', 'right'):
+                if key_pressed in ('left', 'right', 'escape'):
                     # Dot display response trigger
                     if key_pressed == 'left':
                         parallel.setData(4) # left key pressed
                     elif key_pressed == 'right':
                         parallel.setData(6) # right key pressed
+                    else:
+                        core.quit()
 
                     break
+            
+            if time.time() - start_time_time > TRIAL_TIMEOUT:
+                key_pressed = None
+                break
         
         
 
@@ -180,15 +192,21 @@ def show_blobs(blobs_stimuli):
             keys_pressed = event.getKeys()
             if len(keys_pressed) > 0:  # at least one key was pressed
                 key_pressed = keys_pressed[0]
-                if key_pressed in ('left', 'right'):
+                if key_pressed in ('left', 'right', 'escape'):
                     # Blob display response trigger
                     # Trigger codes for left/right same as for dot displays
                     if key_pressed == 'left':
                         parallel.setData(4) # left key pressed
                     elif key_pressed == 'right':
                         parallel.setData(6) # right key pressed
+                    else:
+                        core.quit()
 
                     break
+
+            if time.time() - start_time_time > TRIAL_TIMEOUT:
+                key_pressed = None
+                break
 
         rt_time = time.time() - start_time_time
         rt_clock = trialClock.getTime() - start_time_clock
@@ -200,7 +218,7 @@ def show_blobs(blobs_stimuli):
 
 #=============================================================================
 
-blocks_stimuli = load_stimuli()
+blocks_stimuli = load_stimuli(filename=STIMULI_FILENAME)
 
 INSTRUCTIONS_TEXT_1 = '''
 In this experiment, on each trial, you will be shown
@@ -296,6 +314,13 @@ def countdown(tics = 100):
         if time_elapsed > tics:
             break
 
+        keys_pressed = event.getKeys()
+        if len(keys_pressed) > 0:  # at least one key was pressed
+            if keys_pressed[0] == 'escape':
+                core.quit()
+            break
+
+
 def show_instructions(text):
 
     instrtext.setText(text)
@@ -306,6 +331,8 @@ def show_instructions(text):
         # listen for key press
         keys_pressed = event.getKeys()
         if len(keys_pressed) > 0:  # at least one key was pressed
+            if keys_pressed[0] == 'escape':
+                core.quit()
             break
 
 
@@ -348,9 +375,9 @@ for k, block_stimuli in enumerate(blocks_stimuli):
     with open(results_date_time_stamp + '_results.json', 'w') as f:
         json.dump(RESULTS, f, indent=4)
     
-    if k + 1 < len(blobs_stimuli):
+    if k + 1 < len(blocks_stimuli):
         # Inter-block countdown trigger
         parallel.setData(10)
-        countdown(tics = 100)
+        countdown(tics = BREAK_DURATION)
 
 show_block_start('Experiment completed.')
