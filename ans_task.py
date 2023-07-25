@@ -192,8 +192,13 @@ def show_dots(dots_stimuli):
         rt_time = time.time() - start_time_time
         rt_clock = trialClock.getTime() - start_time_clock
 
-        results.append([left_uid, right_uid, left_number_circles, right_number_circles,
-                        key_pressed, rt_time, rt_clock])
+        results.append(dict(left_uid=left_uid,
+                            right_uid=right_uid,
+                            left_size=left_number_circles,
+                            right_size=right_number_circles,
+                            key_pressed=key_pressed,
+                            rt_time=rt_time,
+                            rt_clock=rt_clock))
 
     return results
 
@@ -254,8 +259,13 @@ def show_blobs(blobs_stimuli):
         rt_time = time.time() - start_time_time
         rt_clock = trialClock.getTime() - start_time_clock
 
-        results.append([left_uid, right_uid, left_blob_area, right_blob_area,
-                        key_pressed, rt_time, rt_clock])
+        results.append(dict(left_uid=left_uid,
+                            right_uid=right_uid,
+                            left_size=left_blob_area,
+                            right_size=right_blob_area,
+                            key_pressed=key_pressed,
+                            rt_time=rt_time,
+                            rt_clock=rt_clock))
 
     return results
 
