@@ -8,38 +8,34 @@ from datetime import datetime
 
 # ============================= Parameters ====================================================
 
-TRIAL_TIMEOUT = 5 # Number of seconds before trial times out and moves on
-USE_FULLSCREEN = True # Use fullscreen? Best to set to True for real thing
-BREAK_DURATION = 100 # Number of seconds for the break between blocks; set to around 100 for real thing
-STIMULI_FILENAME = 'stimuli_4_50_1010101' # The stimuli filename wo the .json extension
-# Set the following to True when using the stimulus presentation
-# device that uses a parallel port to send triggers
-# Comment out this line to use triggers
-USE_PARALLEL_PORT = True
-USE_DIALOG = True
-
 results_date_time_stamp = datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
 
 # ============================= Dialog Box =====================================================
 
 expInfo = {'Participant ID': '',
-           'Stimuli file': STIMULI_FILENAME,
-           'Break duration': BREAK_DURATION,
-           'Fullscreen': USE_FULLSCREEN,
-           'Parallel port': USE_PARALLEL_PORT,
-           'Trial timeout': TRIAL_TIMEOUT}
+           'Stimuli file': ['stimuli_4_50_1010101', 'stimuli_4_5_1010101'],
+           'Break duration': [100, 10, 5],# Number of seconds for the break between blocks; set to around 100 for real thing
+           'Fullscreen': True, # Use fullscreen? Best to set to True for real thing
+           'Parallel port': True, # Set to True when using the stimulus presentation
+           'Age': list(range(18, 81)),
+           'Handedness': ['Right', 'Left', 'Both'],
+           'Gender': ['Female', 'Male', 'Non-binary', 'Prefer not to say'],
+           'Trial timeout': [5, 1, 0.5]}# Number of seconds before trial times out and moves on
 
-if USE_DIALOG:
-    dlg = gui.DlgFromDict(dictionary=expInfo, 
-                          title='ANS Task Experiment', 
-                          order = ['Participant ID', 
-                                   'Stimuli file', 
-                                   'Break duration', 
-                                   'Trial timeout', 
-                                   'Fullscreen', 
-                                   'Parallel port'])
-    if dlg.OK == False:
-        core.quit()
+dlg = gui.DlgFromDict(dictionary=expInfo, 
+                        title='ANS Task Experiment', 
+                        order = ['Participant ID', 
+                                'Age',
+                                'Gender',
+                                'Handedness',
+                                'Stimuli file', 
+                                'Break duration', 
+                                'Trial timeout', 
+                                'Fullscreen', 
+                                'Parallel port'])
+
+if dlg.OK == False:
+    core.quit()
 
 TRIAL_TIMEOUT = float(expInfo['Trial timeout'])
 BREAK_DURATION = int(expInfo['Break duration'])
@@ -400,6 +396,9 @@ dots_blobs_order = ['dots', 'blobs']
 experiment_information = {}
 experiment_information['code'] = this_module_as_string()
 experiment_information['participant_id'] = expInfo['Participant ID']
+experiment_information['participant_gender'] = expInfo['Gender']
+experiment_information['participant_age'] = expInfo['Age']
+experiment_information['participant_handedness'] = expInfo['Handedness']
 experiment_information['fullscreen'] = USE_FULLSCREEN
 experiment_information['stimuli_file'] = expInfo['Stimuli file']
 experiment_information['trial_timeout'] = expInfo['Trial timeout']
