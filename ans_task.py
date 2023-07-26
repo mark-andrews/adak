@@ -90,7 +90,7 @@ def load_stimuli(filename='stimuli'):
     return stimuli
 
 def parallel_setData(trigger):
-    parallel.setData(0)
+    # parallel.setData(0)
     parallel.setData(trigger)
 
 
@@ -181,6 +181,7 @@ def show_dots(dots_stimuli):
             
             if time.time() - start_time_time > TRIAL_TIMEOUT:
                 key_pressed = None
+                parallel_setData(8) # No response, timeout
                 break
         
         
@@ -223,7 +224,7 @@ def show_blobs(blobs_stimuli):
         event.clearEvents()
         
         # Blob display trial start trigger
-        parallel_setData(8)
+        parallel_setData(10)
 
         while True:
 
@@ -250,6 +251,7 @@ def show_blobs(blobs_stimuli):
 
             if time.time() - start_time_time > TRIAL_TIMEOUT:
                 key_pressed = None
+                parallel_setData(8)
                 break
 
         rt_time = time.time() - start_time_time
@@ -386,7 +388,7 @@ instrtext = visual.TextStim(
     win=win, text='INSTRUCTIONS TEXT', font=u'Arial', color='black', height=0.06, alignText='left')
 
 
-
+parallel.setData(20)
 show_instructions(INSTRUCTIONS_TEXT_1)
 show_instructions(INSTRUCTIONS_TEXT_2)
 
@@ -410,7 +412,7 @@ RESULTS = [experiment_information]
 for k, block_stimuli in enumerate(blocks_stimuli):
     
     # Block start trigger
-    parallel.setData(0)
+    parallel.setData(22)
 
     show_block_start('Block %d of %d' % (k+1, len(blocks_stimuli)))
 
