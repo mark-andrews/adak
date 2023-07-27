@@ -4,7 +4,7 @@ library(tidyverse)
 library(lubridate)
 library(rjson)
 
-results <- fromJSON(file= 'andrews_07_25_2023_21_05_25_results.json')
+results <- fromJSON(file= 'EM_Pilot_07_26_2023_14_53_26_results.json')
 
 experiment_info <- results[[1]]
 
@@ -22,7 +22,8 @@ process_each_block <- function(i){
 }
 
 # all the data from the above json file as a data frame
-map_dfr(seq(2, length(results)), process_each_block) %>%
+data_df <- 
+  map_dfr(seq(2, length(results)), process_each_block) %>%
   mutate(left_larger = left_size > right_size, 
          left_press = key_pressed == 'left', 
          accuracy = left_larger == left_press) 
