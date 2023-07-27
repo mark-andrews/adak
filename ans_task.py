@@ -20,6 +20,7 @@ expInfo = {'Participant ID': '',
            'Age': list(range(18, 81)),
            'Handedness': ['Right', 'Left', 'Both'],
            'Gender': ['Female', 'Male', 'Non-binary', 'Prefer not to say'],
+           'ISI': [1.0, 2.0, 3.0, 5.0],
            'Trial timeout': [5, 1, 0.5]}# Number of seconds before trial times out and moves on
 
 dlg = gui.DlgFromDict(dictionary=expInfo, 
@@ -31,6 +32,7 @@ dlg = gui.DlgFromDict(dictionary=expInfo,
                                 'Stimuli file', 
                                 'Break duration', 
                                 'Trial timeout', 
+                                'ISI', 
                                 'Fullscreen', 
                                 'Parallel port'])
 
@@ -42,6 +44,7 @@ BREAK_DURATION = int(expInfo['Break duration'])
 STIMULI_FILENAME = expInfo['Stimuli file']
 USE_FULLSCREEN = expInfo['Fullscreen']
 USE_PARALLEL_PORT = expInfo['Parallel port']
+ISI = float(expInfo['ISI']) # probably should be around 1
 
 # ============================= Set up =====================================================
 
@@ -196,6 +199,8 @@ def show_dots(dots_stimuli):
                             key_pressed=key_pressed,
                             rt_time=rt_time,
                             rt_clock=rt_clock))
+        
+        add_isi(win, ISI) # Interval stimulus interval
 
     return results
 
@@ -264,6 +269,8 @@ def show_blobs(blobs_stimuli):
                             key_pressed=key_pressed,
                             rt_time=rt_time,
                             rt_clock=rt_clock))
+        
+        add_isi(win, ISI) # Interval stimulus interval
 
     return results
 
@@ -296,6 +303,15 @@ def countdown(tics = 100):
         if len(keys_pressed) > 0:  # at least one key was pressed
             if keys_pressed[0] == 'escape':
                 core.quit()
+            break
+
+
+def add_isi(win, duration):
+    'Add a blank screen for `duration` seconds'
+    isi_start_time = trialClock.getTime()
+    while True:
+        win.flip()
+        if trialClock.getTime() - isi_start_time >= duration:
             break
 
 
