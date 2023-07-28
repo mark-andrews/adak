@@ -1,5 +1,13 @@
 A Psychopy based Approximate Number System (ANS) task
 
+## Run the experiment
+
+```
+python ans_task.py
+```
+
+or else in standalone Psychopy, just open that script in the coder and run it.
+
 
 ## How to generate stimuli
 
