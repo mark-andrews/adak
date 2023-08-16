@@ -76,6 +76,22 @@ else:
 # copied from previous Psychopy trigger code
 parallel.setPortAddress(address=0x0378)
 
+# ============================== Trigger codes =============================================
+
+trigger_dict = dict(start_experiment = 20,
+                    end_experiment = 24,
+                    start_block = 4,
+                    end_block = 5,
+                    show_instructions = 6,
+                    start_dot_trial = 8,
+                    start_blob_trial = 10,
+                    left_response = 12,
+                    right_response = 14,
+                    no_response = 18)
+
+def fire_trigger(label):
+    parallel.setData(trigger_dict[label])
+
 
 # ============================= UTILS ==========================================================
 
@@ -91,11 +107,6 @@ def load_stimuli(filename='stimuli'):
         stimuli = json.load(f)
 
     return stimuli
-
-def parallel_setData(trigger):
-    # parallel.setData(0)
-    parallel.setData(trigger)
-
 
 class BlobDisplayObject:
 
@@ -158,7 +169,7 @@ def show_dots(dots_stimuli):
         event.clearEvents()
 
         # Dot display trial start trigger
-        parallel_setData(2)
+        fire_trigger('start_dot_trial')
 
         while True:
 
@@ -174,9 +185,9 @@ def show_dots(dots_stimuli):
                 if key_pressed in ('left', 'right', 'escape'):
                     # Dot display response trigger
                     if key_pressed == 'left':
-                        parallel_setData(4) # left key pressed
+                        fire_trigger('left_response')
                     elif key_pressed == 'right':
-                        parallel_setData(6) # right key pressed
+                        fire_trigger('right_response')
                     else:
                         core.quit()
 
@@ -184,7 +195,7 @@ def show_dots(dots_stimuli):
             
             if time.time() - start_time_time > TRIAL_TIMEOUT:
                 key_pressed = None
-                parallel_setData(8) # No response, timeout
+                fire_trigger('no_response') # No response, timeout
                 break
         
         
@@ -229,7 +240,7 @@ def show_blobs(blobs_stimuli):
         event.clearEvents()
         
         # Blob display trial start trigger
-        parallel_setData(10)
+        fire_trigger('start_blob_trial')
 
         while True:
 
@@ -246,9 +257,11 @@ def show_blobs(blobs_stimuli):
                     # Blob display response trigger
                     # Trigger codes for left/right same as for dot displays
                     if key_pressed == 'left':
-                        parallel_setData(4) # left key pressed
+                        # left key pressed
+                        fire_trigger('left_response')
                     elif key_pressed == 'right':
-                        parallel_setData(6) # right key pressed
+                        # right key pressed
+                        fire_trigger('right_response')
                     else:
                         core.quit()
 
@@ -256,7 +269,7 @@ def show_blobs(blobs_stimuli):
 
             if time.time() - start_time_time > TRIAL_TIMEOUT:
                 key_pressed = None
-                parallel_setData(8)
+                fire_trigger('no_response')
                 break
 
         rt_time = time.time() - start_time_time
@@ -403,8 +416,11 @@ start_text = visual.TextStim(win=win, text='Hello', color='black')
 instrtext = visual.TextStim(
     win=win, text='INSTRUCTIONS TEXT', font=u'Arial', color='black', height=0.06, alignText='left')
 
+fire_trigger('start_experiment')
+show_block_start('Experiment starting.')
 
-parallel.setData(20)
+
+fire_trigger('show_instructions')
 show_instructions(INSTRUCTIONS_TEXT_1)
 show_instructions(INSTRUCTIONS_TEXT_2)
 
@@ -428,7 +444,7 @@ RESULTS = [experiment_information]
 for k, block_stimuli in enumerate(blocks_stimuli):
     
     # Block start trigger
-    parallel.setData(22)
+    fire_trigger('start_block')
 
     show_block_start('Block %d of %d' % (k+1, len(blocks_stimuli)))
 
@@ -457,11 +473,12 @@ for k, block_stimuli in enumerate(blocks_stimuli):
     # write results to file
     with open(expInfo['Participant ID'] + '_' + results_date_time_stamp + '_results.json', 'w') as f:
         json.dump(RESULTS, f, indent=4)
+
+    fire_trigger('end_block')
     
     if k + 1 < len(blocks_stimuli):
-        # Inter-block countdown trigger
-        parallel_setData(10)
         countdown(tics = BREAK_DURATION)
 
+fire_trigger('end_experiment')
 show_block_start('Experiment completed.')
 
