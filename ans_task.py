@@ -478,6 +478,8 @@ for k, block_stimuli in enumerate(blocks_stimuli):
     
     if k + 1 < len(blocks_stimuli):
         countdown(tics = BREAK_DURATION)
+    else:
+        show_block_start('End block')
 
 fire_trigger('end_experiment')
 show_block_start('Experiment completed.')
