@@ -26,7 +26,7 @@ expInfo = {
     "Handedness": ["Right", "Left", "Both"],
     "Gender": ["Female", "Male", "Non-binary", "Prefer not to say"],
     "ISI": [1.0, 2.0, 3.0, 5.0],
-    "Trial timeout": [5, 1, 0.5],
+    "Trial timeout": [5, 10, 1, 0.5],
 }  # Number of seconds before trial times out and moves on
 
 dlg = gui.DlgFromDict(
