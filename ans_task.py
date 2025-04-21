@@ -14,7 +14,7 @@ results_date_time_stamp = datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
 
 expInfo = {
     "Participant ID": "",
-    "Stimuli file": ["stimuli_4_50_1010101", "stimuli_4_5_1010101"],
+    "Stimuli file": ["stimuli_3_30_103", "stimuli_4_50_1010101", "stimuli_4_5_1010101", "stimuli_3_50_103"],
     "Break duration": [
         100,
         10,
@@ -22,28 +22,28 @@ expInfo = {
     ],  # Number of seconds for the break between blocks; set to around 100 for real thing
     "Fullscreen": True,  # Use fullscreen? Best to set to True for real thing
     "Parallel port": True,  # Set to True when using the stimulus presentation
-    "Age": list(range(18, 81)),
+    "Age": list(range(4, 81)),
     "Handedness": ["Right", "Left", "Both"],
     "Gender": ["Female", "Male", "Non-binary", "Prefer not to say"],
     "ISI": [1.0, 2.0, 3.0, 5.0],
-    "Trial timeout": [5, 10, 1, 0.5],
+    "Trial timeout": [10, 5, 1, 0.5],
 }  # Number of seconds before trial times out and moves on
 
 dlg = gui.DlgFromDict(
     dictionary=expInfo,
     title="ANS Task Experiment",
-    # order=[
-    #     "Participant ID",
-    #     "Age",
-    #     "Gender",
-    #     "Handedness",
-    #     "Stimuli file",
-    #     "Break duration",
-    #     "Trial timeout",
-    #     "ISI",
-    #     "Fullscreen",
-    #     "Parallel port",
-    # ],
+    order=[
+        "Participant ID",
+        "Age",
+        "Gender",
+        "Handedness",
+        "Stimuli file",
+        "Break duration",
+        "Trial timeout",
+        "ISI",
+        "Fullscreen",
+        "Parallel port",
+    ],
 )
 
 if not dlg.OK:
